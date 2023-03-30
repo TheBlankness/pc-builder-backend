@@ -1,29 +1,29 @@
-const dotenv = require('dotenv')
+const dotenv = require("dotenv");
 
-let ENV_FILE_NAME = '';
+let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
-	case 'production':
-		ENV_FILE_NAME = '.env.production';
-		break;
-	case 'staging':
-		ENV_FILE_NAME = '.env.staging';
-		break;
-	case 'test':
-		ENV_FILE_NAME = '.env.test';
-		break;
-	case 'development':
-	default:
-		ENV_FILE_NAME = '.env';
-		break;
+  case "production":
+    ENV_FILE_NAME = ".env.production";
+    break;
+  case "staging":
+    ENV_FILE_NAME = ".env.staging";
+    break;
+  case "test":
+    ENV_FILE_NAME = ".env.test";
+    break;
+  case "development":
+  default:
+    ENV_FILE_NAME = ".env";
+    break;
 }
 
 try {
-	dotenv.config({ path: process.cwd() + '/' + ENV_FILE_NAME });
-} catch (e) {
-}
+  dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
+} catch (e) {}
 
 // CORS when consuming Medusa from admin
-const ADMIN_CORS = process.env.ADMIN_CORS || "http://localhost:7000,http://localhost:7001";
+const ADMIN_CORS =
+  process.env.ADMIN_CORS || "http://localhost:7000,http://localhost:7001";
 
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || "http://localhost:8000";
@@ -45,18 +45,29 @@ const plugins = [
   `medusa-payment-manual`,
   // Uncomment to add Stripe support.
   // You can create a Stripe account via: https://stripe.com
-  // {
-  //   resolve: `medusa-payment-stripe`,
-  //   options: {
-  //     api_key: STRIPE_API_KEY,
-  //     webhook_secret: STRIPE_WEBHOOK_SECRET,
-  //   },
-  // },
+  {
+    resolve: `medusa-payment-stripe`,
+    options: {
+      api_key: STRIPE_API_KEY,
+      webhook_secret: STRIPE_WEBHOOK_SECRET,
+    },
+  },
+  {
+    resolve: `medusa-plugin-sendgrid`,
+    options: {
+      api_key: process.env.SENDGRID_API_KEY,
+      from: process.env.SENDGRID_FROM,
+      order_placed_template: process.env.SENDGRID_ORDER_PLACED_ID,
+      customer_password_reset_template:
+        process.env.SENDGRID_CUSTOMER_PASSWORD_RESET_ID,
+      user_password_reset_template: process.env.USER_PASSWORD_RESET_TEMPLATE,
+    },
+  },
 ];
 /** @type {import('@medusajs/medusa').ConfigModule} */
 module.exports = {
   projectConfig: {
-    // redis_url: REDIS_URL,
+    redis_url: REDIS_URL,
     // For more production-like environment install PostgresQL
     // database_url: DATABASE_URL,
     // database_type: "postgres",
